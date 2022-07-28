@@ -1,53 +1,55 @@
 from PyQt5 import uic, QtWidgets
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+import re
+import webbrowser
 
-import time
 
 class Interface():
     def __init__(self):
-        
         main_window = 'interfaces/main_window.ui'
-       
         self.first_page = uic.loadUi(main_window)
         self.first_page.pushButton.clicked.connect(self.bot)
+        self.first_page.toolButton.clicked.connect(self.open_git)
+        
         
     def get_number(self):
         cellphone = self.first_page.cellphone_number.text()
+        
+        
         return cellphone
     
-    def get_mensage(self):
-        mensage = self.first_page.mensage.text()
-        return mensage
- 
+    
+    def get_message(self):
+        message = self.first_page.mensage.text()
         
         
+        return message
+    
+   
+    def str_formater(self, string):
+        number_without_space = str(string).strip()
+        number_without_especial_char = re.sub('[^A-Za-z0-9]+', '', number_without_space)
         
+        
+        return number_without_especial_char
+    
+    
     def bot (self):
-        self.browser = webdriver.Chrome()
-        ('https://web.whatsapp.com/')
-        cellphone_number = self.get_number()
-        mensage_to_send = self.get_mensage()       
-                
-
-        self.link = f"https://web.whatsapp.com/send?phone={cellphone_number}&text={mensage_to_send}"
-
-        self.browser.get(self.link)
-
-        while len(self.browser.find_elements_by_id("side")) < 1:
-            # O navegador vai aguardar o whats até que o elemento "side" seja renderizado após o logon
-            time.sleep(1)
-
-        self.browser.find_element_by_xpath(
-                                            '//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[2]').send_keys(
-                                                Keys.ENTER
-        )#Será feito a busca do elemento da mesagem e logo após apertará o enter
+        contry_code = '55'
+        cellphone_number = contry_code+self.str_formater(self.get_number())
+        message_to_send = self.get_message()
+        try:
+            self.link = f"https://web.whatsapp.com/send?phone={cellphone_number}&text={message_to_send}"
+            webbrowser.open_new_tab(self.link)
+                                            
+        except:
+            pass
 
 
+    def open_git(self):
+        webbrowser.open_new_tab('https://github.com/vbsx')
+        
         
 app=QtWidgets.QApplication([])        
-start_interface = Interface()  
-
-
+start_interface = Interface()
 start_interface.first_page.show()
 app.exec()
